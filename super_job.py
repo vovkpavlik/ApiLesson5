@@ -1,28 +1,15 @@
 import requests
 from environs import Env
-from terminaltables import AsciiTable
-
-
-LANGUAGES = [
-    "Python",
-    "Java",
-    "Javascript",
-    "PHP",
-    "C++",
-    "CSS",
-    "C#",
-    "C",
-]
 
 
 def get_professions_superjob(lang, page):
-    id_town = 4
+    id_moscow = 4
     headers = {
         "X-Api-App-Id": Env().str("TOKEN_SUPERJOB"),
     }
 
     params = {
-        "town": id_town,
+        "town": id_moscow,
         "keyword": f"Программист {lang}",
         "page": page,
         "count": 15
@@ -30,10 +17,11 @@ def get_professions_superjob(lang, page):
 
     base_url = "https://api.superjob.ru/2.33/"
     response = requests.get(f"{base_url}vacancies/", headers=headers, params=params)
+    response.raise_for_status()
     return response.json()
 
 
-def predict_rub_salary(vacancy):
+def predict_sj_rub_salary(vacancy):
     if not vacancy["payment_from"] and not vacancy["payment_to"] or vacancy["currency"] != "rub":
         return None
     if not vacancy["payment_to"]:
@@ -44,9 +32,9 @@ def predict_rub_salary(vacancy):
         return (vacancy["payment_from"] + vacancy["payment_to"]) / 2
 
 
-def get_stats_sj():
+def get_stats_sj(languages):
     stats_sj = {}
-    for lang in LANGUAGES:
+    for lang in languages:
         vacancies = []
         salaries = []
 
@@ -64,7 +52,7 @@ def get_stats_sj():
             vacancies += response["objects"]
 
         for vacancy in vacancies:
-            if predicted_salary := predict_rub_salary(vacancy):
+            if predicted_salary := predict_sj_rub_salary(vacancy):
                 salaries.append(predicted_salary)
 
         lang_stat = {
@@ -74,16 +62,3 @@ def get_stats_sj():
         }
         stats_sj.update({lang: lang_stat})
     return stats_sj
-
-
-# def get_table_superjob(stats):
-#     title = "Вакансии superjob"
-#     table_data = [
-#         ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"],
-#     ]
-#     for lang in stats:
-#         table_data.append(
-#             [lang, stats[lang]["vacancies_found"], stats[lang]["vacancies_processed"], stats[lang]["average_salaries"]]
-#         )
-#         table = AsciiTable(table_data, title)
-#     return table.table

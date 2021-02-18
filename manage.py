@@ -4,6 +4,18 @@ from terminaltables import AsciiTable
 from environs import Env
 
 
+LANGUAGES = [
+    "Python",
+    "Java",
+    "Javascript",
+    "PHP",
+    "C++",
+    "CSS",
+    "C#",
+    "C",
+]
+
+
 def get_table_vacancies(stats, title):
     table_data = [
         ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"],
@@ -18,5 +30,5 @@ def get_table_vacancies(stats, title):
 
 if __name__ == '__main__':
     Env().read_env()
-    print(get_table_vacancies(get_stats_hh(), "Вакансии headhunter"))
-    print(get_table_vacancies(get_stats_sj(), "Вакансии superjob"))
+    print(get_table_vacancies(get_stats_hh(LANGUAGES), "Вакансии headhunter"))
+    print(get_table_vacancies(get_stats_sj(LANGUAGES), "Вакансии superjob"))

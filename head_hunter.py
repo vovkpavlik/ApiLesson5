@@ -1,26 +1,16 @@
 import requests
-from terminaltables import AsciiTable
-
-
-LANGUAGES = [
-    "Python",
-    "Java",
-    "Javascript",
-    "PHP",
-    "C++",
-    "CSS",
-    "C#",
-    "C",
-]
 
 
 def get_vacancies(lang, page):
+    count_days = 30
+    id_moscow = 1
+
     base_url = "https://api.hh.ru/"
     params = {
         "text": f"программист {lang}",
-        "period": "7",
-        "area": "1",
-        "per_page": 80,
+        "period": count_days,
+        "area": id_moscow,
+        "per_page": 100,
         "page": page
     }
     response = requests.get(f"{base_url}vacancies", params=params)
@@ -28,7 +18,7 @@ def get_vacancies(lang, page):
     return response.json()
 
 
-def predict_rub_salary(vacancy):
+def predict_hh_rub_salary(vacancy):
     if not vacancy or vacancy["currency"] != "RUR":
         return None
     elif not vacancy["to"]:
@@ -38,22 +28,22 @@ def predict_rub_salary(vacancy):
     else:
         return (vacancy["from"] + vacancy["to"]) / 2
 
-def get_stats_hh():
+def get_stats_hh(languages):
     stats_hh = {}
-    for lang in LANGUAGES:
+    for lang in languages:
         salaries = []
         vacancies = []
 
         response = get_vacancies(lang, 0)
-        pages = response["pages"]
         found = response["found"]
         vacancies += response["items"]
 
-        for page in range(1, pages+1):
+        # Результатов не может быть более 2000(https://github.com/hhru/api/blob/master/docs/vacancies.md#запрос)
+        for page in range(1, 20):
             vacancies += get_vacancies(lang, page)["items"]
 
         for vacancy in vacancies:
-            if predicted_salary := predict_rub_salary(vacancy["salary"]):
+            if predicted_salary := predict_hh_rub_salary(vacancy["salary"]):
                 salaries.append(predicted_salary)
 
         lang_stat = {
@@ -63,16 +53,3 @@ def get_stats_hh():
         }
         stats_hh.update({lang: lang_stat})
     return stats_hh
-
-
-# def get_table_hh(stats):
-#     title = "Вакансии headhunter"
-#     table_data = [
-#         ["Язык программирования", "Вакансий найдено", "Вакансий обработано", "Средняя зарплата"],
-#     ]
-#     for lang in stats:
-#         table_data.append(
-#             [lang, stats[lang]["vacancies_found"], stats[lang]["vacancies_processed"], stats[lang]["average_salaries"]]
-#         )
-#         table = AsciiTable(table_data, title)
-#     return table.table

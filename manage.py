@@ -1,7 +1,8 @@
-from head_hunter import get_stats_hh
-from super_job import get_stats_sj
-from terminaltables import AsciiTable
 from environs import Env
+from terminaltables import AsciiTable
+
+from head_hunter import get_hh_stats
+from super_job import get_sj_stats
 
 
 LANGUAGES = [
@@ -29,6 +30,11 @@ def get_table_vacancies(stats, title):
 
 
 if __name__ == '__main__':
-    Env().read_env()
-    print(get_table_vacancies(get_stats_hh(LANGUAGES), "Вакансии headhunter"))
-    print(get_table_vacancies(get_stats_sj(LANGUAGES), "Вакансии superjob"))
+    
+    env = Env()
+    env.read_env()
+    token = env.str("TOKEN_SUPERJOB")
+
+
+    print(get_table_vacancies(get_hh_stats(LANGUAGES), "Вакансии headhunter"))
+    print(get_table_vacancies(get_sj_stats(LANGUAGES, token), "Вакансии superjob"))

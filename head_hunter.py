@@ -4,13 +4,14 @@ import requests
 def get_vacancies(lang, page):
     count_days = 30
     id_moscow = 1
+    per_page = 100
 
     base_url = "https://api.hh.ru/"
     params = {
         "text": f"программист {lang}",
         "period": count_days,
         "area": id_moscow,
-        "per_page": 100,
+        "per_page": per_page,
         "page": page
     }
     response = requests.get(f"{base_url}vacancies", params=params)
@@ -28,14 +29,15 @@ def predict_hh_rub_salary(vacancy):
     else:
         return (vacancy["from"] + vacancy["to"]) / 2
 
-def get_stats_hh(languages):
-    stats_hh = {}
+
+def get_hh_stats(languages):
+    hh_stats = {}
     for lang in languages:
         salaries = []
         vacancies = []
 
         response = get_vacancies(lang, 0)
-        found = response["found"]
+        vacancies_found = response["found"]
         vacancies += response["items"]
 
         # Результатов не может быть более 2000(https://github.com/hhru/api/blob/master/docs/vacancies.md#запрос)
@@ -47,9 +49,9 @@ def get_stats_hh(languages):
                 salaries.append(predicted_salary)
 
         lang_stat = {
-            "vacancies_found": found,
+            "vacancies_found": vacancies_found,
             "vacancies_processed": len(salaries),
             "average_salaries": int(sum(salaries) / len(salaries))
         }
-        stats_hh.update({lang: lang_stat})
-    return stats_hh
+        hh_stats.update({lang: lang_stat})
+    return hh_stats

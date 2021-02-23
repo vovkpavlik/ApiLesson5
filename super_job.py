@@ -1,18 +1,18 @@
 import requests
-from environs import Env
 
 
-def get_professions_superjob(lang, page):
-    id_moscow = 4
+def get_superjob_professions(lang, page, token):
+    moscow_id = 4
+    per_page = 15
     headers = {
-        "X-Api-App-Id": Env().str("TOKEN_SUPERJOB"),
+        "X-Api-App-Id": token,
     }
 
     params = {
-        "town": id_moscow,
+        "town": moscow_id,
         "keyword": f"Программист {lang}",
         "page": page,
-        "count": 15
+        "count": per_page
     }
 
     base_url = "https://api.superjob.ru/2.33/"
@@ -32,14 +32,14 @@ def predict_sj_rub_salary(vacancy):
         return (vacancy["payment_from"] + vacancy["payment_to"]) / 2
 
 
-def get_stats_sj(languages):
-    stats_sj = {}
+def get_sj_stats(languages, token):
+    sj_stats = {}
     for lang in languages:
         vacancies = []
         salaries = []
 
         page = 1
-        response = get_professions_superjob(lang, page)
+        response = get_superjob_professions(lang, page, token)
         more_page = response["more"]
 
         found = response["total"]
@@ -47,7 +47,7 @@ def get_stats_sj(languages):
 
         while more_page:
             page += 1
-            response = get_professions_superjob(lang, page)
+            response = get_superjob_professions(lang, page, token)
             more_page = response["more"]
             vacancies += response["objects"]
 
@@ -60,5 +60,5 @@ def get_stats_sj(languages):
             "vacancies_processed": len(salaries),
             "average_salaries": int(sum(salaries) / len(salaries))
         }
-        stats_sj.update({lang: lang_stat})
-    return stats_sj
+        sj_stats.update({lang: lang_stat})
+    return sj_stats

@@ -1,5 +1,7 @@
 import requests
 
+from salary import get_predict_rub_salary
+
 
 def get_superjob_professions(lang, page, token):
     moscow_id = 4
@@ -19,17 +21,6 @@ def get_superjob_professions(lang, page, token):
     response = requests.get(f"{base_url}vacancies/", headers=headers, params=params)
     response.raise_for_status()
     return response.json()
-
-
-def predict_sj_rub_salary(vacancy):
-    if not vacancy["payment_from"] and not vacancy["payment_to"] or vacancy["currency"] != "rub":
-        return None
-    if not vacancy["payment_to"]:
-        return vacancy["payment_from"] * 1.2
-    elif not vacancy["payment_from"]:
-        return vacancy["payment_to"] * 0.8
-    else:
-        return (vacancy["payment_from"] + vacancy["payment_to"]) / 2
 
 
 def get_sj_stats(languages, token):
@@ -52,7 +43,9 @@ def get_sj_stats(languages, token):
             vacancies += response["objects"]
 
         for vacancy in vacancies:
-            if predicted_salary := predict_sj_rub_salary(vacancy):
+            if vacancy["currency"] != "rub":
+                continue
+            if predicted_salary := get_predict_rub_salary(vacancy["payment_from"], vacancy["payment_to"]):
                 salaries.append(predicted_salary)
 
         lang_stat = {

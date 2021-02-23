@@ -1,5 +1,7 @@
 import requests
 
+from salary import get_predict_rub_salary
+
 
 def get_vacancies(lang, page):
     count_days = 30
@@ -19,17 +21,6 @@ def get_vacancies(lang, page):
     return response.json()
 
 
-def predict_hh_rub_salary(vacancy):
-    if not vacancy or vacancy["currency"] != "RUR":
-        return None
-    elif not vacancy["to"]:
-        return vacancy["from"] * 1.2
-    elif not vacancy["from"]:
-        return vacancy["to"] * 0.8
-    else:
-        return (vacancy["from"] + vacancy["to"]) / 2
-
-
 def get_hh_stats(languages):
     hh_stats = {}
     for lang in languages:
@@ -45,7 +36,9 @@ def get_hh_stats(languages):
             vacancies += get_vacancies(lang, page)["items"]
 
         for vacancy in vacancies:
-            if predicted_salary := predict_hh_rub_salary(vacancy["salary"]):
+            if not vacancy["salary"] or vacancy["salary"]["currency"] != "RUR":
+                continue
+            if predicted_salary := get_predict_rub_salary(vacancy["salary"]["from"], vacancy["salary"]["to"]):
                 salaries.append(predicted_salary)
 
         lang_stat = {

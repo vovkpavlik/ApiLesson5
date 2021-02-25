@@ -1,6 +1,6 @@
 import requests
 
-from salary import get_predict_rub_salary
+from salary import predict_rub_salary
 
 
 def get_superjob_professions(lang, page, token):
@@ -45,7 +45,7 @@ def get_sj_stats(languages, token):
         for vacancy in vacancies:
             if vacancy["currency"] != "rub":
                 continue
-            if predicted_salary := get_predict_rub_salary(vacancy["payment_from"], vacancy["payment_to"]):
+            if predicted_salary := predict_rub_salary(vacancy["payment_from"], vacancy["payment_to"]):
                 salaries.append(predicted_salary)
 
         lang_stat = {

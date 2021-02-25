@@ -16,7 +16,7 @@ LANGUAGES = [
 ]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     
     env = Env()
     env.read_env()

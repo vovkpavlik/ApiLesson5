@@ -1,6 +1,6 @@
 import requests
 
-from salary import get_predict_rub_salary
+from salary import predict_rub_salary
 
 
 def get_vacancies(lang, page):
@@ -38,7 +38,7 @@ def get_hh_stats(languages):
         for vacancy in vacancies:
             if not vacancy["salary"] or vacancy["salary"]["currency"] != "RUR":
                 continue
-            if predicted_salary := get_predict_rub_salary(vacancy["salary"]["from"], vacancy["salary"]["to"]):
+            if predicted_salary := predict_rub_salary(vacancy["salary"]["from"], vacancy["salary"]["to"]):
                 salaries.append(predicted_salary)
 
         lang_stat = {

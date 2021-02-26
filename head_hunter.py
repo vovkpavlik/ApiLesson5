@@ -1,4 +1,5 @@
 import requests
+from pprint import pprint
 
 from salary import predict_rub_salary
 
@@ -30,9 +31,10 @@ def get_hh_stats(languages):
         response = get_vacancies(lang, 0)
         vacancies_found = response["found"]
         vacancies += response["items"]
+        pages = response["pages"]
 
         # Результатов не может быть более 2000(https://github.com/hhru/api/blob/master/docs/vacancies.md#запрос)
-        for page in range(1, 20):
+        for page in range(1, pages):
             vacancies += get_vacancies(lang, page)["items"]
 
         for vacancy in vacancies:

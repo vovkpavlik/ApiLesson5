@@ -1,5 +1,4 @@
 import requests
-from pprint import pprint
 
 from salary import predict_rub_salary
 

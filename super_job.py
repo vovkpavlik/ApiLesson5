@@ -23,35 +23,44 @@ def get_superjob_professions(lang, page, token):
     return response.json()
 
 
-def get_sj_stats(languages, token):
-    sj_stats = {}
-    for lang in languages:
-        vacancies = []
-        salaries = []
+def get_language_salaries(lang, token):
+    vacancies = []
+    salaries = []
 
-        page = 1
+    page = 1
+    response = get_superjob_professions(lang, page, token)
+    more_page = response["more"]
+
+    vacancies += response["objects"]
+
+    while more_page:
+        page += 1
         response = get_superjob_professions(lang, page, token)
         more_page = response["more"]
-
-        found = response["total"]
         vacancies += response["objects"]
 
-        while more_page:
-            page += 1
-            response = get_superjob_professions(lang, page, token)
-            more_page = response["more"]
-            vacancies += response["objects"]
+    for vacancy in vacancies:
+        if vacancy["currency"] != "rub":
+            continue
+        if predicted_salary := predict_rub_salary(vacancy["payment_from"], vacancy["payment_to"]):
+            salaries.append(predicted_salary)
+    return salaries
 
-        for vacancy in vacancies:
-            if vacancy["currency"] != "rub":
-                continue
-            if predicted_salary := predict_rub_salary(vacancy["payment_from"], vacancy["payment_to"]):
-                salaries.append(predicted_salary)
+
+def get_language_found(lang, page, token):
+    response = get_superjob_professions(lang, page, token)
+    found = response["total"]
+    return found
+
+
+def get_sj_stats(languages, page, token):
+    sj_stats = {}
+    for lang in languages:
 
         lang_stat = {
-            "vacancies_found": found,
-            "vacancies_processed": len(salaries),
-            "average_salaries": int(sum(salaries) / len(salaries))
+            "vacancies_found": get_language_found(lang, page, token),
+            "vacancies_processed": len(get_language_salaries(lang, token)),
+            "average_salaries": int(sum(get_language_salaries(lang, token)) / len(get_language_salaries(lang, token)))
         }
         sj_stats.update({lang: lang_stat})
     return sj_stats

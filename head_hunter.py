@@ -49,10 +49,11 @@ def get_language_vacancies(lang):
 def get_hh_stats(languages):
     hh_stats = {}
     for lang in languages:
+        language_salaries = get_language_salaries(lang)
         lang_stat = {
             "vacancies_found": get_language_vacancies(lang),
-            "vacancies_processed": len(get_language_salaries(lang)),
-            "average_salaries": int(sum(get_language_salaries(lang)) / len(get_language_salaries(lang)))
+            "vacancies_processed": len(language_salaries),
+            "average_salaries": int(sum(language_salaries) / len(language_salaries))
         }
         hh_stats.update({lang: lang_stat})
     return hh_stats

@@ -56,11 +56,11 @@ def get_language_found(lang, page, token):
 def get_sj_stats(languages, page, token):
     sj_stats = {}
     for lang in languages:
-
+        language_salaries = get_language_found(lang, page, token)
         lang_stat = {
             "vacancies_found": get_language_found(lang, page, token),
-            "vacancies_processed": len(get_language_salaries(lang, token)),
-            "average_salaries": int(sum(get_language_salaries(lang, token)) / len(get_language_salaries(lang, token)))
+            "vacancies_processed": len(language_salaries),
+            "average_salaries": int(sum(language_salaries) / len(language_salaries))
         }
         sj_stats.update({lang: lang_stat})
     return sj_stats

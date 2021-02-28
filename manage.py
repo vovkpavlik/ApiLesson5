@@ -24,4 +24,4 @@ if __name__ == "__main__":
 
 
     print(get_vacancies_table(get_hh_stats(LANGUAGES), "Вакансии headhunter"))
-    print(get_vacancies_table(get_sj_stats(LANGUAGES, 1, token), "Вакансии superjob"))
+    # print(get_vacancies_table(get_sj_stats(LANGUAGES, 1, token), "Вакансии superjob"))

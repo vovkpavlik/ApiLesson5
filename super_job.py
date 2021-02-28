@@ -62,5 +62,5 @@ def get_sj_stats(languages, page, token):
             "vacancies_processed": len(language_salaries),
             "average_salaries": int(sum(language_salaries) / len(language_salaries))
         }
-        sj_stats.update({lang: lang_stat})
+        sj_stats[lang] = lang_stat
     return sj_stats

@@ -29,6 +29,7 @@ def get_language_salaries(lang, token):
 
     page = 1
     response = get_superjob_professions(lang, page, token)
+    found = response["total"]
     more_page = response["more"]
 
     vacancies += response["objects"]
@@ -44,21 +45,15 @@ def get_language_salaries(lang, token):
             continue
         if predicted_salary := predict_rub_salary(vacancy["payment_from"], vacancy["payment_to"]):
             salaries.append(predicted_salary)
-    return salaries
+    return salaries, found
 
 
-def get_language_found(lang, page, token):
-    response = get_superjob_professions(lang, page, token)
-    found = response["total"]
-    return found
-
-
-def get_sj_stats(languages, page, token):
+def get_sj_stats(languages, token):
     sj_stats = {}
     for lang in languages:
-        language_salaries = get_language_salaries(lang, token)
+        language_salaries, language_vacancies = get_language_salaries(lang, token)
         lang_stat = {
-            "vacancies_found": get_language_found(lang, page, token),
+            "vacancies_found": language_vacancies,
             "vacancies_processed": len(language_salaries),
             "average_salaries": int(sum(language_salaries) / len(language_salaries))
         }

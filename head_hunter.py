@@ -55,5 +55,5 @@ def get_hh_stats(languages):
             "vacancies_processed": len(language_salaries),
             "average_salaries": int(sum(language_salaries) / len(language_salaries))
         }
-        hh_stats.update({lang: lang_stat})
+        hh_stats[lang] = lang_stat
     return hh_stats
